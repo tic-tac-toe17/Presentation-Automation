@@ -1,0 +1,688 @@
+{
+  "name": "Präsentations-Generator Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "presentation-generator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000001",
+      "name": "Webhook GET - Seite",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [560, 1280],
+      "webhookId": "pg-get-page-001"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000002",
+      "name": "HTML Seite ausliefern",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1000, 1280]
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookUrl = $('Webhook GET - Seite').item.json.headers.host;\nconst protocol = $('Webhook GET - Seite').item.json.headers['x-forwarded-proto'] || 'https';\nconst postUrl = `${protocol}://${webhookUrl}/webhook/presentation-generator-submit`;\n\nconst html = `<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Angebots-Präsentation Generator | Deutsche Telekom MMS</title>\n<link href=\"https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@500&display=swap\" rel=\"stylesheet\">\n<style>\n:root {\n  --bg: #F2F2F2;\n  --surface: #FFFFFF;\n  --surface-2: #F7F7F7;\n  --border: #DEDEDE;\n  --border-faint: rgba(0,0,0,0.08);\n  --magenta: #E20074;\n  --magenta-dark: #C4005F;\n  --magenta-dim: rgba(226,0,116,0.07);\n  --magenta-mid: rgba(226,0,116,0.14);\n  --text: #262626;\n  --text-2: #6A6A6A;\n  --text-3: #9E9E9E;\n  --green: #007A3D;\n  --green-dim: rgba(0,122,61,0.07);\n  --green-border: rgba(0,122,61,0.22);\n  --red: #CC0000;\n  --red-dim: rgba(204,0,0,0.06);\n  --red-border: rgba(204,0,0,0.2);\n  --font-head: 'TeleNeoWeb','TeleNeo','DM Sans',sans-serif;\n  --font-body: 'TeleNeoWeb','TeleNeo','DM Sans',sans-serif;\n  --font-mono: 'IBM Plex Mono',monospace;\n  --radius: 6px;\n  --radius-sm: 4px;\n  --radius-xs: 3px;\n  --shadow-card: 0 2px 12px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.07);\n  --shadow-hover: 0 6px 24px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.08);\n}\n\n* { margin:0; padding:0; box-sizing:border-box; }\n\nbody {\n  font-family: var(--font-body);\n  background: var(--bg);\n  color: var(--text);\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n\n.header {\n  width: 100%;\n  background: var(--magenta);\n  padding: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n}\n\n.header-inner {\n  width: 100%;\n  max-width: 780px;\n  padding: 28px 32px;\n  display: flex;\n  align-items: center;\n  gap: 18px;\n}\n\n.header-logo {\n  width: 48px;\n  height: 48px;\n  background: #fff;\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-weight: 800;\n  font-size: 22px;\n  color: var(--magenta);\n  flex-shrink: 0;\n  font-family: var(--font-head);\n}\n\n.header h1 {\n  color: #fff;\n  font-family: var(--font-head);\n  font-size: 22px;\n  font-weight: 700;\n  letter-spacing: -0.3px;\n}\n\n.header p {\n  color: rgba(255,255,255,0.82);\n  font-size: 14px;\n  margin-top: 2px;\n}\n\n.main {\n  width: 100%;\n  max-width: 780px;\n  padding: 32px 16px 48px;\n}\n\n.card {\n  background: var(--surface);\n  border-radius: var(--radius);\n  box-shadow: var(--shadow-card);\n  padding: 36px 32px;\n  margin-bottom: 20px;\n}\n\n.card-title {\n  font-family: var(--font-head);\n  font-size: 17px;\n  font-weight: 700;\n  margin-bottom: 6px;\n  color: var(--text);\n}\n\n.card-desc {\n  font-size: 13.5px;\n  color: var(--text-2);\n  margin-bottom: 24px;\n  line-height: 1.5;\n}\n\n.form-group {\n  margin-bottom: 22px;\n}\n\n.form-group label {\n  display: block;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: var(--text);\n  margin-bottom: 7px;\n}\n\n.form-group label .required {\n  color: var(--magenta);\n  margin-left: 2px;\n}\n\n.form-group label .optional {\n  color: var(--text-3);\n  font-weight: 400;\n  font-size: 12px;\n  margin-left: 4px;\n}\n\ninput[type=\"text\"],\ninput[type=\"email\"],\ninput[type=\"number\"],\nselect,\ntextarea {\n  width: 100%;\n  padding: 10px 14px;\n  font-family: var(--font-body);\n  font-size: 14px;\n  color: var(--text);\n  background: var(--surface-2);\n  border: 1.5px solid var(--border);\n  border-radius: var(--radius-sm);\n  outline: none;\n  transition: border-color 0.15s, box-shadow 0.15s;\n}\n\ninput:focus, select:focus, textarea:focus {\n  border-color: var(--magenta);\n  box-shadow: 0 0 0 3px var(--magenta-dim);\n}\n\ntextarea {\n  min-height: 120px;\n  resize: vertical;\n  line-height: 1.55;\n}\n\nselect {\n  cursor: pointer;\n  appearance: none;\n  background-image: url(\"data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236A6A6A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\");\n  background-repeat: no-repeat;\n  background-position: right 14px center;\n  padding-right: 36px;\n}\n\n.file-upload-area {\n  border: 2px dashed var(--border);\n  border-radius: var(--radius);\n  padding: 28px 20px;\n  text-align: center;\n  cursor: pointer;\n  transition: border-color 0.2s, background 0.2s;\n  background: var(--surface-2);\n}\n\n.file-upload-area:hover,\n.file-upload-area.drag-over {\n  border-color: var(--magenta);\n  background: var(--magenta-dim);\n}\n\n.file-upload-area .icon {\n  font-size: 32px;\n  margin-bottom: 8px;\n  color: var(--text-3);\n}\n\n.file-upload-area .text {\n  font-size: 14px;\n  color: var(--text-2);\n}\n\n.file-upload-area .text strong {\n  color: var(--magenta);\n  cursor: pointer;\n}\n\n.file-upload-area .hint {\n  font-size: 12px;\n  color: var(--text-3);\n  margin-top: 6px;\n}\n\n.file-list {\n  margin-top: 12px;\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n}\n\n.file-item {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  background: var(--surface-2);\n  border: 1px solid var(--border);\n  border-radius: var(--radius-xs);\n  padding: 8px 12px;\n  font-size: 13px;\n}\n\n.file-item .name {\n  color: var(--text);\n  font-weight: 500;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  max-width: 70%;\n}\n\n.file-item .size {\n  color: var(--text-3);\n  font-size: 12px;\n  font-family: var(--font-mono);\n}\n\n.file-item .remove {\n  color: var(--red);\n  cursor: pointer;\n  font-size: 18px;\n  line-height: 1;\n  padding: 0 4px;\n  border: none;\n  background: none;\n}\n\n.row {\n  display: flex;\n  gap: 16px;\n}\n\n.row .form-group {\n  flex: 1;\n}\n\n.btn-submit {\n  width: 100%;\n  padding: 14px 24px;\n  background: var(--magenta);\n  color: #fff;\n  font-family: var(--font-head);\n  font-size: 15px;\n  font-weight: 700;\n  border: none;\n  border-radius: var(--radius-sm);\n  cursor: pointer;\n  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;\n  letter-spacing: 0.2px;\n}\n\n.btn-submit:hover {\n  background: var(--magenta-dark);\n  box-shadow: var(--shadow-hover);\n}\n\n.btn-submit:active {\n  transform: scale(0.985);\n}\n\n.btn-submit:disabled {\n  opacity: 0.55;\n  cursor: not-allowed;\n  transform: none;\n}\n\n/* Loading Overlay */\n.loading-overlay {\n  display: none;\n  position: fixed;\n  inset: 0;\n  background: rgba(0,0,0,0.45);\n  z-index: 1000;\n  align-items: center;\n  justify-content: center;\n}\n\n.loading-overlay.active {\n  display: flex;\n}\n\n.loading-box {\n  background: var(--surface);\n  border-radius: var(--radius);\n  box-shadow: var(--shadow-hover);\n  padding: 48px 40px;\n  text-align: center;\n  max-width: 420px;\n  width: 90%;\n}\n\n.spinner {\n  width: 48px;\n  height: 48px;\n  border: 4px solid var(--border);\n  border-top-color: var(--magenta);\n  border-radius: 50%;\n  animation: spin 0.8s linear infinite;\n  margin: 0 auto 20px;\n}\n\n@keyframes spin {\n  to { transform: rotate(360deg); }\n}\n\n.loading-box h2 {\n  font-family: var(--font-head);\n  font-size: 18px;\n  font-weight: 700;\n  margin-bottom: 8px;\n  color: var(--text);\n}\n\n.loading-box p {\n  font-size: 14px;\n  color: var(--text-2);\n  line-height: 1.5;\n}\n\n.loading-step {\n  margin-top: 20px;\n  font-size: 13px;\n  color: var(--magenta);\n  font-weight: 600;\n  font-family: var(--font-mono);\n}\n\n/* Result View */\n.result-view {\n  display: none;\n}\n\n.result-view.active {\n  display: block;\n}\n\n.result-card {\n  background: var(--surface);\n  border-radius: var(--radius);\n  box-shadow: var(--shadow-card);\n  padding: 40px 32px;\n  text-align: center;\n}\n\n.result-icon {\n  width: 64px;\n  height: 64px;\n  background: var(--green-dim);\n  border: 2px solid var(--green-border);\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  margin: 0 auto 20px;\n  font-size: 28px;\n}\n\n.result-card h2 {\n  font-family: var(--font-head);\n  font-size: 20px;\n  font-weight: 700;\n  color: var(--text);\n  margin-bottom: 8px;\n}\n\n.result-card .result-desc {\n  font-size: 14px;\n  color: var(--text-2);\n  margin-bottom: 28px;\n  line-height: 1.5;\n}\n\n.result-links {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  max-width: 360px;\n  margin: 0 auto;\n}\n\n.result-link {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 14px 24px;\n  border-radius: var(--radius-sm);\n  font-family: var(--font-head);\n  font-size: 14px;\n  font-weight: 700;\n  text-decoration: none;\n  transition: background 0.15s, box-shadow 0.15s;\n}\n\n.result-link.primary {\n  background: var(--magenta);\n  color: #fff;\n}\n\n.result-link.primary:hover {\n  background: var(--magenta-dark);\n  box-shadow: var(--shadow-hover);\n}\n\n.result-link.secondary {\n  background: var(--surface-2);\n  color: var(--text);\n  border: 1.5px solid var(--border);\n}\n\n.result-link.secondary:hover {\n  border-color: var(--magenta);\n  background: var(--magenta-dim);\n}\n\n.result-meta {\n  margin-top: 20px;\n  font-size: 13px;\n  color: var(--text-3);\n}\n\n.btn-new {\n  margin-top: 24px;\n  padding: 10px 20px;\n  background: none;\n  border: 1.5px solid var(--border);\n  border-radius: var(--radius-sm);\n  font-family: var(--font-body);\n  font-size: 13px;\n  color: var(--text-2);\n  cursor: pointer;\n  transition: border-color 0.15s, color 0.15s;\n}\n\n.btn-new:hover {\n  border-color: var(--magenta);\n  color: var(--magenta);\n}\n\n/* Error */\n.error-banner {\n  display: none;\n  background: var(--red-dim);\n  border: 1px solid var(--red-border);\n  border-radius: var(--radius-sm);\n  padding: 12px 16px;\n  margin-bottom: 20px;\n  font-size: 13.5px;\n  color: var(--red);\n}\n\n.error-banner.active {\n  display: block;\n}\n\n.footer {\n  margin-top: auto;\n  padding: 20px;\n  text-align: center;\n  font-size: 12px;\n  color: var(--text-3);\n}\n\n@media (max-width: 600px) {\n  .header-inner { padding: 20px 16px; }\n  .card { padding: 24px 18px; }\n  .row { flex-direction: column; gap: 0; }\n  .main { padding: 20px 10px 40px; }\n  .loading-box { padding: 32px 24px; }\n}\n</style>\n</head>\n<body>\n\n<div class=\"header\">\n  <div class=\"header-inner\">\n    <div class=\"header-logo\">T</div>\n    <div>\n      <h1>Angebots-Praesentation Generator</h1>\n      <p>Erstelle professionelle Angebots-Praesentationen aus deinen Meeting-Notizen</p>\n    </div>\n  </div>\n</div>\n\n<div class=\"main\">\n  <!-- Form View -->\n  <div id=\"formView\">\n    <div class=\"card\">\n      <div class=\"card-title\">Projekt-Informationen</div>\n      <div class=\"card-desc\">Gib die Eckdaten deines Angebots ein. Je mehr Kontext du lieferst, desto besser wird die Praesentation.</div>\n\n      <div id=\"errorBanner\" class=\"error-banner\"></div>\n\n      <form id=\"presentationForm\" enctype=\"multipart/form-data\">\n        <div class=\"row\">\n          <div class=\"form-group\">\n            <label>Kundenname <span class=\"required\">*</span></label>\n            <input type=\"text\" id=\"clientName\" name=\"clientName\" placeholder=\"z.B. Deutsche Bahn AG\" required>\n          </div>\n          <div class=\"form-group\">\n            <label>Praesentationstyp <span class=\"required\">*</span></label>\n            <select id=\"presentationType\" name=\"presentationType\" required>\n              <option value=\"Angebot\">Angebot / Proposal</option>\n              <option value=\"Projektvorstellung\">Projektvorstellung</option>\n              <option value=\"Statusbericht\">Statusbericht</option>\n              <option value=\"Strategie\">Strategie-Praesentation</option>\n            </select>\n          </div>\n        </div>\n\n        <div class=\"form-group\">\n          <label>Meeting-Notizen / Kontext <span class=\"required\">*</span></label>\n          <textarea id=\"meetingNotes\" name=\"meetingNotes\" placeholder=\"Beschreibe das Kundengespraech, die Anforderungen, gewuenschte Loesungen, Budget-Rahmen, Timeline etc.\" required></textarea>\n        </div>\n\n        <div class=\"form-group\">\n          <label>Dateien hochladen <span class=\"optional\">(optional)</span></label>\n          <div class=\"file-upload-area\" id=\"dropZone\">\n            <div class=\"icon\">&#128206;</div>\n            <div class=\"text\"><strong>Klicke hier</strong> oder ziehe Dateien in dieses Feld</div>\n            <div class=\"hint\">.txt, .pdf, .docx, .md — max. 10 MB pro Datei</div>\n          </div>\n          <input type=\"file\" id=\"fileInput\" name=\"files\" multiple accept=\".txt,.pdf,.docx,.md\" style=\"display:none\">\n          <div class=\"file-list\" id=\"fileList\"></div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"form-group\">\n            <label>Deine E-Mail-Adresse <span class=\"required\">*</span></label>\n            <input type=\"email\" id=\"email\" name=\"email\" placeholder=\"vorname.nachname@telekom.de\" required>\n          </div>\n          <div class=\"form-group\">\n            <label>Anzahl Slides</label>\n            <input type=\"number\" id=\"numSlides\" name=\"numSlides\" value=\"10\" min=\"5\" max=\"20\">\n          </div>\n        </div>\n\n        <button type=\"submit\" class=\"btn-submit\" id=\"submitBtn\">Praesentation generieren</button>\n      </form>\n    </div>\n  </div>\n\n  <!-- Result View -->\n  <div id=\"resultView\" class=\"result-view\">\n    <div class=\"result-card\">\n      <div class=\"result-icon\">&#10003;</div>\n      <h2>Praesentation erfolgreich erstellt!</h2>\n      <p class=\"result-desc\">Deine Angebots-Praesentation wurde generiert und an <strong id=\"resultEmail\"></strong> gesendet.</p>\n      <div class=\"result-links\">\n        <a id=\"linkView\" href=\"#\" target=\"_blank\" class=\"result-link primary\">&#9654; Praesentation ansehen</a>\n        <a id=\"linkDownload\" href=\"#\" target=\"_blank\" class=\"result-link secondary\">&#11015; PowerPoint herunterladen</a>\n      </div>\n      <div class=\"result-meta\" id=\"resultMeta\"></div>\n      <button class=\"btn-new\" onclick=\"resetForm()\">Neue Praesentation erstellen</button>\n    </div>\n  </div>\n</div>\n\n<!-- Loading Overlay -->\n<div class=\"loading-overlay\" id=\"loadingOverlay\">\n  <div class=\"loading-box\">\n    <div class=\"spinner\"></div>\n    <h2>Praesentation wird erstellt...</h2>\n    <p>Deine Angebots-Praesentation wird gerade generiert. Das kann 1-2 Minuten dauern.</p>\n    <div class=\"loading-step\" id=\"loadingStep\">Daten werden verarbeitet...</div>\n  </div>\n</div>\n\n<div class=\"footer\">Automatisiert erstellt vom Praesentations-Generator | Deutsche Telekom MMS GmbH</div>\n\n<script>\nconst POST_URL = '${postUrl}';\nlet selectedFiles = [];\n\n// File Upload Handling\nconst dropZone = document.getElementById('dropZone');\nconst fileInput = document.getElementById('fileInput');\nconst fileList = document.getElementById('fileList');\n\ndropZone.addEventListener('click', () => fileInput.click());\n\ndropZone.addEventListener('dragover', (e) => {\n  e.preventDefault();\n  dropZone.classList.add('drag-over');\n});\n\ndropZone.addEventListener('dragleave', () => {\n  dropZone.classList.remove('drag-over');\n});\n\ndropZone.addEventListener('drop', (e) => {\n  e.preventDefault();\n  dropZone.classList.remove('drag-over');\n  addFiles(e.dataTransfer.files);\n});\n\nfileInput.addEventListener('change', () => {\n  addFiles(fileInput.files);\n  fileInput.value = '';\n});\n\nfunction addFiles(files) {\n  const allowed = ['.txt','.pdf','.docx','.md'];\n  for (const f of files) {\n    const ext = '.' + f.name.split('.').pop().toLowerCase();\n    if (!allowed.includes(ext)) continue;\n    if (f.size > 10 * 1024 * 1024) continue;\n    if (!selectedFiles.find(s => s.name === f.name)) {\n      selectedFiles.push(f);\n    }\n  }\n  renderFiles();\n}\n\nfunction renderFiles() {\n  fileList.innerHTML = selectedFiles.map((f, i) =>\n    '<div class=\"file-item\">' +\n      '<span class=\"name\">' + f.name + '</span>' +\n      '<span class=\"size\">' + (f.size / 1024).toFixed(1) + ' KB</span>' +\n      '<button type=\"button\" class=\"remove\" onclick=\"removeFile(' + i + ')\">&times;</button>' +\n    '</div>'\n  ).join('');\n}\n\nfunction removeFile(idx) {\n  selectedFiles.splice(idx, 1);\n  renderFiles();\n}\n\n// Form Submit\ndocument.getElementById('presentationForm').addEventListener('submit', async (e) => {\n  e.preventDefault();\n  const btn = document.getElementById('submitBtn');\n  const errorBanner = document.getElementById('errorBanner');\n  errorBanner.classList.remove('active');\n\n  const clientName = document.getElementById('clientName').value.trim();\n  const presentationType = document.getElementById('presentationType').value;\n  const meetingNotes = document.getElementById('meetingNotes').value.trim();\n  const email = document.getElementById('email').value.trim();\n  const numSlides = document.getElementById('numSlides').value || '10';\n\n  if (!clientName || !meetingNotes || !email) {\n    errorBanner.textContent = 'Bitte fuelle alle Pflichtfelder aus.';\n    errorBanner.classList.add('active');\n    return;\n  }\n\n  btn.disabled = true;\n  showLoading();\n\n  const formData = new FormData();\n  formData.append('clientName', clientName);\n  formData.append('presentationType', presentationType);\n  formData.append('meetingNotes', meetingNotes);\n  formData.append('email', email);\n  formData.append('numSlides', numSlides);\n\n  selectedFiles.forEach(f => formData.append('files', f));\n\n  try {\n    updateStep('KI analysiert deine Eingaben...');\n    const res = await fetch(POST_URL, { method: 'POST', body: formData });\n    if (!res.ok) throw new Error('Server-Fehler: ' + res.status);\n    const data = await res.json();\n\n    if (data.success) {\n      showResult(data, email);\n    } else {\n      throw new Error(data.error || 'Unbekannter Fehler');\n    }\n  } catch (err) {\n    hideLoading();\n    errorBanner.textContent = 'Fehler: ' + err.message;\n    errorBanner.classList.add('active');\n    btn.disabled = false;\n  }\n});\n\nfunction showLoading() {\n  document.getElementById('loadingOverlay').classList.add('active');\n}\n\nfunction hideLoading() {\n  document.getElementById('loadingOverlay').classList.remove('active');\n}\n\nfunction updateStep(text) {\n  document.getElementById('loadingStep').textContent = text;\n}\n\nfunction showResult(data, email) {\n  hideLoading();\n  document.getElementById('formView').style.display = 'none';\n  document.getElementById('resultView').classList.add('active');\n  document.getElementById('resultEmail').textContent = email;\n  document.getElementById('linkView').href = data.url || '#';\n  document.getElementById('linkDownload').href = data.exportUrl || '#';\n  if (!data.url) document.getElementById('linkView').style.display = 'none';\n  if (!data.exportUrl) document.getElementById('linkDownload').style.display = 'none';\n  document.getElementById('resultMeta').textContent = (data.cardCount || '') + ' Slides erstellt';\n}\n\nfunction resetForm() {\n  document.getElementById('formView').style.display = 'block';\n  document.getElementById('resultView').classList.remove('active');\n  document.getElementById('presentationForm').reset();\n  selectedFiles = [];\n  renderFiles();\n  document.getElementById('submitBtn').disabled = false;\n  document.getElementById('errorBanner').classList.remove('active');\n}\n</script>\n</body>\n</html>`;\n\nreturn [{ json: { html } }];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000003",
+      "name": "HTML generieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 1280]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "presentation-generator-submit",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000010",
+      "name": "Webhook POST - Formular",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [560, 1600],
+      "webhookId": "pg-post-submit-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract form fields from webhook body\nconst input = $input.first().json;\nconst body = input.body || input;\n\nconst clientName = (body.clientName || '').trim();\nconst presentationType = (body.presentationType || 'Angebot').trim();\nconst meetingNotes = (body.meetingNotes || '').trim();\nconst email = (body.email || '').trim();\nconst numSlides = parseInt(body.numSlides || '10', 10);\n\nif (!clientName || !meetingNotes || !email) {\n  return [{ json: { error: 'Pflichtfelder fehlen', success: false } }];\n}\n\n// Process uploaded binary files - extract text content\nlet fileTexts = [];\nconst binaryData = $input.first().binary || {};\n\nfor (const key of Object.keys(binaryData)) {\n  const file = binaryData[key];\n  const fileName = file.fileName || key;\n  const mimeType = file.mimeType || '';\n\n  try {\n    // For text-based files, decode the base64 content\n    if (mimeType.includes('text') || fileName.endsWith('.txt') || fileName.endsWith('.md')) {\n      const content = Buffer.from(file.data, 'base64').toString('utf-8');\n      fileTexts.push(`--- Datei: ${fileName} ---\\n${content}`);\n    } else {\n      // For PDF/DOCX, we'll note them for downstream processing\n      fileTexts.push(`--- Datei: ${fileName} (${mimeType}) --- [Inhalt wird separat extrahiert]`);\n    }\n  } catch (e) {\n    fileTexts.push(`--- Datei: ${fileName} --- [Konnte nicht gelesen werden]`);\n  }\n}\n\nconst contextDocument = fileTexts.join('\\n\\n');\nconst sessionId = email;\n\nreturn [{\n  json: {\n    clientName,\n    presentationType,\n    meetingNotes,\n    email,\n    numSlides,\n    contextDocument,\n    sessionId,\n    success: true\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000011",
+      "name": "Eingabe verarbeiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 1600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "condition-valid",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000012",
+      "name": "Eingabe gueltig?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 1600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: $json.error || 'Ungueltige Eingabe' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000013",
+      "name": "Fehler zurueckgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1220, 1760]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Erstelle eine professionelle Angebots-Präsentation für folgenden Kunden und Kontext:\n\n**Kunde:** {{ $json.clientName }}\n**Präsentationstyp:** {{ $json.presentationType }}\n**Anzahl Slides:** {{ $json.numSlides }}\n\n**Meeting-Notizen / Kontext vom Vertriebsmitarbeiter:**\n{{ $json.meetingNotes }}\n\n{{ $json.contextDocument ? '**Zusätzliche Dokumente:**\\n' + $json.contextDocument : '' }}",
+        "options": {
+          "systemMessage": "Du bist ein Präsentations-Experte der Deutschen Telekom MMS. Deine einzige Aufgabe ist es, aus den bereitgestellten Meeting-Notizen und Kontext-Dokumenten einen detaillierten, strukturierten Präsentations-Prompt auf Deutsch zu erstellen, der direkt an eine Präsentations-KI (Gamma) weitergegeben wird.\n\nAnalysiere die bereitgestellten Informationen und erstelle einen vollständigen Präsentations-Prompt mit:\n\n1. Titel der Präsentation (inkl. Kundenname)\n2. Art (Angebot, Projektvorstellung, Statusbericht, Strategie, etc.)\n3. Zielgruppe\n4. Detaillierte Slide-für-Slide Inhaltsbeschreibung\n\nSLIDE-STRUKTUREN je nach Typ:\n- ANGEBOTE/PROPOSALS: Titelfolie mit Kundenname → Executive Summary → Kundenverständnis (zeige dass wir die Anforderungen verstanden haben) → Lösungsansatz (2-3 Slides mit konkreten Maßnahmen) → Vorteile & Mehrwert → Preisüberblick/Investition → Timeline & Meilensteine → Warum Telekom MMS → Nächste Schritte → Kontakt\n- PROJEKTVORSTELLUNGEN: Titelfolie → Projektziel → Ausgangslage → Lösung (2-3 Slides) → Meilensteine → Team → Nächste Schritte\n- STATUSBERICHTE: Titelfolie → Zusammenfassung → Fortschritt → Highlights → Risiken → Nächste Schritte → Ausblick\n- STRATEGIE: Titelfolie → Vision → Marktanalyse → Strategische Ziele → Maßnahmen → Roadmap → KPIs → Nächste Schritte\n\nWICHTIG:\n- Deine Ausgabe ist NUR der formatierte Präsentations-Prompt — kein Smalltalk, keine Rückfragen, keine Erklärungen.\n- Nutze die konkreten Informationen aus den Meeting-Notizen und Dokumenten. Erwähne spezifische Details, Zahlen, Anforderungen die genannt wurden.\n- Falls wichtige Informationen fehlen, ergänze sinnvolle Platzhalter basierend auf dem Kontext (z.B. [Preis auf Anfrage], [Timeline nach Absprache]).\n- Schreibe alles auf Deutsch.\n- Der Prompt muss so detailliert sein, dass eine KI daraus direkt eine professionelle Präsentation generieren kann.\n- Passe die Anzahl der Slides an die vom Nutzer gewünschte Anzahl an."
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000020",
+      "name": "AI Praesentation strukturieren",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [1220, 1600],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-haiku-4-5-20251001",
+          "mode": "list",
+          "cachedResultName": "Claude Haiku 4.5"
+        },
+        "options": {
+          "maxTokensToSample": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1200, 1820],
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000021",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "rPswZL9R7l9PZjLk",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Eingabe verarbeiten').item.json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000022",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [1300, 1820]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://public-api.gamma.app/v1.0/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ inputText: $json.output, themeId: '505zj9lldoki3hm', format: 'presentation', textMode: 'preserve', textOptions: { language: 'de', tone: 'professional', audience: 'executives', amount: 'medium' }, cardOptions: { dimensions: '16x9', headerFooter: { topLeft: { type: 'image', source: 'themeLogo', size: 'md' }, bottomRight: { type: 'text', value: 'Deutsche Telekom MMS' } } }, numCards: $('Eingabe verarbeiten').item.json.numSlides || 10, imageOptions: { source: 'noImages' }, sharingOptions: { workspaceAccess: 'view', externalAccess: 'view' }, exportAs: 'pptx' }) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000030",
+      "name": "Gamma Praesentation generieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1440, 1600],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TQklLptqTt5Iuqnh",
+          "name": "Header Auth account Gamma"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000031",
+      "name": "30 Sekunden warten",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1660, 1600],
+      "webhookId": "pg-wait-001"
+    },
+    {
+      "parameters": {
+        "url": "=https://public-api.gamma.app/v1.0/generations/{{ $('Gamma Praesentation generieren').item.json.generationId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000032",
+      "name": "Status pruefen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1880, 1600],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TQklLptqTt5Iuqnh",
+          "name": "Header Auth account Gamma"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "condition-complete",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000033",
+      "name": "Fertig?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2100, 1600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ergebnis formatieren\nconst status = $input.first().json;\nconst email = $('Eingabe verarbeiten').item.json.email;\nconst clientName = $('Eingabe verarbeiten').item.json.clientName;\n\nconst url = status.gammaUrl || status.url || '';\nconst exportUrl = status.exportUrl || status.pdfUrl || '';\nconst cardCount = status.cardCount || 0;\n\n// HTML E-Mail Body\nconst htmlBody = `\n<div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <div style=\"background-color: #E20074; padding: 24px; text-align: center; border-radius: 6px 6px 0 0;\">\n    <h1 style=\"color: #FFFFFF; margin: 0; font-size: 22px;\">Deine Pr\\u00e4sentation ist fertig!</h1>\n  </div>\n  <div style=\"padding: 28px; background-color: #F8F8F8;\">\n    <p style=\"font-size: 15px; color: #333;\">Deine Angebots-Pr\\u00e4sentation f\\u00fcr <strong>${clientName}</strong> wurde erfolgreich erstellt.</p>\n    <p style=\"font-size: 15px; color: #333;\"><strong>Anzahl Slides:</strong> ${cardCount}</p>\n    <div style=\"margin: 28px 0; text-align: center;\">\n      ${url ? '<a href=\"' + url + '\" style=\"display: inline-block; background-color: #E20074; color: #FFFFFF; padding: 14px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 8px;\">Pr\\u00e4sentation ansehen</a>' : ''}\n      ${exportUrl ? '<a href=\"' + exportUrl + '\" style=\"display: inline-block; background-color: #333333; color: #FFFFFF; padding: 14px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 8px;\">PowerPoint herunterladen</a>' : ''}\n    </div>\n    <p style=\"font-size: 13px; color: #666;\">Du kannst die Pr\\u00e4sentation jederzeit \\u00fcber die Links oben \\u00f6ffnen und bearbeiten.</p>\n  </div>\n  <div style=\"padding: 16px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee;\">\n    Automatisch erstellt vom Pr\\u00e4sentations-Generator | Deutsche Telekom MMS\n  </div>\n</div>`;\n\nreturn [{\n  json: {\n    success: true,\n    url,\n    exportUrl,\n    cardCount,\n    email,\n    clientName,\n    emailBody: htmlBody\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000040",
+      "name": "Ergebnis aufbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2320, 1600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, url: $json.url, exportUrl: $json.exportUrl, cardCount: $json.cardCount }) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000041",
+      "name": "Ergebnis an Website",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2540, 1520]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Deine Präsentation für {{ $json.clientName }} ist fertig!",
+        "message": "={{ $json.emailBody }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000042",
+      "name": "E-Mail senden",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [2540, 1700],
+      "webhookId": "pg-email-001",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "eYIu4j5CyBTmpZUW",
+          "name": "customerdemo.mailbox@magenta365.de"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'KI-Verarbeitung fehlgeschlagen: ' + ($json.error || $json.output || 'Unbekannter Fehler') }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000061",
+      "name": "Agent Fehler zurueckgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1440, 1800]
+    },
+    {
+      "parameters": {
+        "content": "### 1 - WEBSITE\nWebhook (GET) liefert eine vollstaendige HTML-Seite\nmit Telekom MMS Corporate Design aus.\n\nDie Seite enthaelt:\n- Formular mit Kundenname, Typ, Meeting-Notizen\n- Datei-Upload (Drag & Drop) fuer .txt, .pdf, .docx, .md\n- E-Mail-Adresse und Slide-Anzahl\n- Loading-Overlay waehrend der Verarbeitung\n- Ergebnis-Ansicht mit Download-Links",
+        "height": 300,
+        "width": 520
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000050",
+      "name": "Sticky Note - Website",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [500, 960]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'Gamma-Generierung fehlgeschlagen: ' + ($json.error || $json.message || 'Unbekannter Fehler') }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000062",
+      "name": "Gamma Fehler zurueckgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1660, 1800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\n\n// Track poll attempts using node-level static data\nconst nodeData = $getWorkflowStaticData('node');\nconst pollKey = 'poll_attempts';\nconst pollAttempts = (nodeData[pollKey] || 0) + 1;\nnodeData[pollKey] = pollAttempts;\n\nconst MAX_ATTEMPTS = 10;\nconst status = response?.status || '';\nconst isCompleted = status === 'completed';\nconst isTimedOut = pollAttempts >= MAX_ATTEMPTS;\nconst hasFailed = status === 'failed' || status === 'error';\n\n// Clean up when done\nif (isCompleted || isTimedOut || hasFailed) {\n  delete nodeData[pollKey];\n}\n\nreturn [{\n  json: {\n    ...response,\n    status,\n    isCompleted,\n    isTimedOut,\n    hasFailed,\n    pollAttempts\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000063",
+      "name": "Poll auswerten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2100, 1800]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "condition-timeout",
+              "leftValue": "={{ $json.isTimedOut || $json.hasFailed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000064",
+      "name": "Timeout oder Fehler?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2320, 1800]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'Gamma-Generierung Timeout nach ' + ($json.pollAttempts || 0) + ' Versuchen. Status: ' + ($json.status || 'unbekannt') }) }}",
+        "options": {
+          "responseCode": 504
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000065",
+      "name": "Timeout Fehler zurueckgeben",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2540, 1900]
+    },
+    {
+      "parameters": {
+        "content": "### 2 - VERARBEITUNG & KI\nWebhook (POST) empfaengt Formulardaten + Dateien.\n\nDer Code-Node extrahiert alle Eingaben und\nliest Text-Dateien aus. Claude Haiku 4.5 analysiert\nMeeting-Notizen + Dokumente und erstellt einen\ndetaillierten Praesentations-Prompt.\n\nBei ungueltigen Eingaben wird sofort ein\nFehler zurueckgegeben.",
+        "height": 280,
+        "width": 380
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000051",
+      "name": "Sticky Note - Verarbeitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [700, 1300]
+    },
+    {
+      "parameters": {
+        "content": "### 3 - GAMMA API\nDer AI-Prompt wird an Gamma gesendet.\n\nKonfiguration:\n- Theme: Telekom MMS (505zj9lldoki3hm)\n- Format: 16:9 Praesentation\n- Sprache: Deutsch, Ton: Professional\n- Export: PPTX\n- Slide-Anzahl: vom User einstellbar\n- Deutsche Telekom MMS Branding",
+        "height": 260,
+        "width": 280
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000052",
+      "name": "Sticky Note - Gamma",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1380, 1300]
+    },
+    {
+      "parameters": {
+        "content": "### 4 - STATUS-POLLING\nGamma generiert asynchron.\n1. Wartet 30 Sekunden\n2. Prueft Generierungs-Status\n3. Fertig → weiter zum Ergebnis\n4. Nicht fertig → zurueck zu Schritt 1",
+        "height": 200,
+        "width": 460
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000053",
+      "name": "Sticky Note - Polling",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1600, 1340]
+    },
+    {
+      "parameters": {
+        "content": "### 5 - AUSGABE\nDas Ergebnis wird zweifach ausgeliefert:\n\n1. **Website:** JSON-Response an den Browser\n   → Loading-Overlay verschwindet\n   → Download-Links werden angezeigt\n\n2. **E-Mail:** Gestylte HTML-Mail via Outlook\n   → mit View- und Download-Links\n   → Telekom MMS Branding",
+        "height": 260,
+        "width": 360
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000054",
+      "name": "Sticky Note - Ausgabe",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2260, 1300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook GET - Seite": {
+      "main": [
+        [
+          {
+            "node": "HTML generieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML generieren": {
+      "main": [
+        [
+          {
+            "node": "HTML Seite ausliefern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook POST - Formular": {
+      "main": [
+        [
+          {
+            "node": "Eingabe verarbeiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eingabe verarbeiten": {
+      "main": [
+        [
+          {
+            "node": "Eingabe gueltig?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eingabe gueltig?": {
+      "main": [
+        [
+          {
+            "node": "AI Praesentation strukturieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler zurueckgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Praesentation strukturieren": {
+      "main": [
+        [
+          {
+            "node": "Gamma Praesentation generieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent Fehler zurueckgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Praesentation strukturieren",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Praesentation strukturieren",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gamma Praesentation generieren": {
+      "main": [
+        [
+          {
+            "node": "30 Sekunden warten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gamma Fehler zurueckgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "30 Sekunden warten": {
+      "main": [
+        [
+          {
+            "node": "Status pruefen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status pruefen": {
+      "main": [
+        [
+          {
+            "node": "Poll auswerten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll auswerten": {
+      "main": [
+        [
+          {
+            "node": "Fertig?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fertig?": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis aufbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Timeout oder Fehler?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Timeout oder Fehler?": {
+      "main": [
+        [
+          {
+            "node": "Timeout Fehler zurueckgeben",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "30 Sekunden warten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ergebnis aufbereiten": {
+      "main": [
+        [
+          {
+            "node": "Ergebnis an Website",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "E-Mail senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "d50af007-1a71-405b-b12f-4927dc492115",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a00f7c4cfc2ef32c991d94ac4823119c3dc5d58c65dcf3e1afaef95e8cd7cbaa"
+  },
+  "id": "f5LdAC7dua5sMHrnvIb5j",
+  "tags": [
+    {
+      "updatedAt": "2026-02-25T14:02:06.369Z",
+      "createdAt": "2026-02-25T14:02:06.369Z",
+      "id": "qxKArMqqpy7XSgNS",
+      "name": "AI"
+    },
+    {
+      "updatedAt": "2026-02-25T14:02:06.369Z",
+      "createdAt": "2026-02-25T14:02:06.369Z",
+      "id": "DvumSSPH0zbAWnrJ",
+      "name": "Sales"
+    },
+    {
+      "updatedAt": "2026-02-25T14:02:06.381Z",
+      "createdAt": "2026-02-25T14:02:06.381Z",
+      "id": "ks3sNalw5HEbby4p",
+      "name": "Presentations"
+    }
+  ]
+}

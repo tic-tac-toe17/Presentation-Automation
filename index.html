@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angebots-Präsentation Generator | Telekom MMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="bg-orb"></div>
+
+  <header>
+    <div class="logo">
+      <img src="dl-telekom-logo-01 Kopie.jpg" alt="Telekom" class="logo-img">
+      <span class="logo-name">Telekom MMS</span>
+    </div>
+    <div class="header-right">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Farbschema wechseln" title="Farbschema wechseln">
+        <svg class="icon-moon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M17.5 11.5A7.5 7.5 0 1 1 8.5 2.5a5.5 5.5 0 0 0 9 9Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 2v1.5M10 16.5V18M18 10h-1.5M3.5 10H2M15.54 4.46l-1.06 1.06M5.52 14.48l-1.06 1.06M15.54 15.54l-1.06-1.06M5.52 5.52 4.46 4.46" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <span class="header-eyebrow">Angebots-Präsentation</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- SECTION 1: Form -->
+    <section id="section-form" class="card">
+      <div class="card-top-bar"></div>
+      <div class="card-inner">
+        <div class="card-header">
+          <h2>Präsentation erstellen</h2>
+          <p class="card-subtitle">KI-gestützte Angebots-Präsentation &middot; Gamma-Dokument &middot; ca. 2–3 Min.</p>
+        </div>
+
+        <form id="presentationForm" enctype="multipart/form-data">
+          <div class="row">
+            <div class="form-group">
+              <label>
+                <span class="label-text">Kundenname</span>
+                <span class="label-badge label-required">Pflichtfeld</span>
+              </label>
+              <input type="text" id="clientName" name="clientName" placeholder="z.B. Deutsche Bahn AG" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="label-text">Präsentationstyp</span>
+                <span class="label-badge label-required">Pflichtfeld</span>
+              </label>
+              <select id="presentationType" name="presentationType" required>
+                <option value="Angebot">Angebot / Proposal</option>
+                <option value="Projektvorstellung">Projektvorstellung</option>
+                <option value="Statusbericht">Statusbericht</option>
+                <option value="Strategie">Strategie-Präsentation</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span class="label-text">Meeting-Notizen / Kontext</span>
+              <span class="label-badge label-required">Pflichtfeld</span>
+            </label>
+            <textarea id="meetingNotes" name="meetingNotes" placeholder="Beschreibe das Kundengespräch, die Anforderungen, gewünschte Lösungen, Budget-Rahmen, Timeline etc." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span class="label-text">Dateien hochladen</span>
+              <span class="label-badge label-optional">optional</span>
+            </label>
+            <div class="file-upload-zone" id="dropZone">
+              <input type="file" id="fileInput" name="files" multiple accept=".txt,.pdf,.docx,.md" hidden>
+              <svg viewBox="0 0 20 20" fill="none" width="20" height="20"><path d="M10 14V3m0 0L6 7m4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <p>.txt, .pdf, .docx, .md Datei hierher ziehen oder <a href="#" id="file-browse-link">durchsuchen</a></p>
+              <p class="file-hint">max. 10 MB pro Datei</p>
+            </div>
+            <div class="file-list" id="fileList"></div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>
+                <span class="label-text">Deine E-Mail-Adresse</span>
+                <span class="label-badge label-required">Pflichtfeld</span>
+              </label>
+              <input type="email" id="email" name="email" placeholder="vorname.nachname@telekom.de" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label>
+                <span class="label-text">Anzahl Slides</span>
+                <span class="label-badge label-optional">optional</span>
+              </label>
+              <input type="number" id="numSlides" name="numSlides" value="10" min="5" max="20">
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn">
+            <span class="btn-label">Präsentation generieren</span>
+            <svg class="btn-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Progress -->
+    <section id="section-progress" class="card hidden">
+      <div class="card-top-bar"></div>
+      <div class="card-inner">
+        <div class="card-header">
+          <h2>Präsentation wird erstellt</h2>
+          <p class="card-subtitle" id="progress-status">Daten werden verarbeitet...</p>
+        </div>
+
+        <div class="pulse-wrap">
+          <div class="pulse-ring ring-1"></div>
+          <div class="pulse-ring ring-2"></div>
+          <div class="pulse-core"></div>
+        </div>
+
+        <div class="steps" id="progress-steps">
+          <div class="step active" id="step-ai">
+            <div class="step-dot"></div>
+            <div class="step-body">
+              <span class="step-name">KI analysiert Eingaben</span>
+              <span class="step-meta">Meeting-Notizen & Dokumente werden ausgewertet</span>
+            </div>
+          </div>
+          <div class="step" id="step-gamma">
+            <div class="step-dot"></div>
+            <div class="step-body">
+              <span class="step-name">Präsentation wird generiert</span>
+              <span class="step-meta">Gamma AI erstellt das Dokument</span>
+            </div>
+          </div>
+          <div class="step" id="step-email">
+            <div class="step-dot"></div>
+            <div class="step-body">
+              <span class="step-name">Ergebnis wird zugestellt</span>
+              <span class="step-meta">Links per E-Mail &amp; auf der Website</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timer-bar">
+          <span class="timer-label">Laufzeit</span>
+          <span id="elapsed-time" class="timer-value">0:00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Results -->
+    <section id="section-results" class="card hidden">
+      <div class="card-top-bar card-top-bar--green"></div>
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="status-icon status-icon--success">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10.5L8 14.5L16 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2>Präsentation erfolgreich erstellt!</h2>
+          <p class="card-subtitle">Deine Angebots-Präsentation wurde generiert und an <strong id="resultEmail"></strong> gesendet.</p>
+        </div>
+
+        <div class="result-actions">
+          <a id="linkView" href="#" target="_blank" class="result-btn result-btn--primary">
+            <div class="result-btn-icon">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6M14 2l4 4m0-4L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="result-btn-text">
+              <span class="result-btn-title">Präsentation ansehen</span>
+              <span class="result-btn-sub">In Gamma öffnen</span>
+            </div>
+          </a>
+          <a id="linkDownload" href="#" target="_blank" class="result-btn result-btn--secondary">
+            <div class="result-btn-icon">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="result-btn-text">
+              <span class="result-btn-title">PowerPoint herunterladen</span>
+              <span class="result-btn-sub">PPTX-Export</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="result-meta" id="resultMeta"></div>
+
+        <button id="new-presentation-btn" class="btn-ghost">Neue Präsentation erstellen</button>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Error -->
+    <section id="section-error" class="card hidden">
+      <div class="card-top-bar card-top-bar--red"></div>
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="status-icon status-icon--error">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 7V11M10 13.5V14M8.57 3.215L2.07 14.5C1.667 15.19 2.166 16 2.97 16H17.03C17.834 16 18.333 15.19 17.93 14.5L11.43 3.215C11.027 2.528 9.973 2.528 8.57 3.215Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Fehler aufgetreten</h2>
+          <p id="error-message" class="error-text"></p>
+        </div>
+        <button id="retry-btn" class="btn-ghost">Erneut versuchen</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Deutsche Telekom MMS GmbH</span>
+    <span class="footer-dot">&middot;</span>
+    <span>KI-gestützte Präsentations-Erstellung</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
