@@ -69,9 +69,9 @@
           <div class="form-group">
             <label>
               <span class="label-text">Meeting-Notizen / Kontext</span>
-              <span class="label-badge label-required">Pflichtfeld</span>
+              <span class="label-badge label-required" id="meetingNotesBadge">Pflichtfeld</span>
             </label>
-            <textarea id="meetingNotes" name="meetingNotes" placeholder="Beschreibe das Kundengespräch, die Anforderungen, gewünschte Lösungen, Budget-Rahmen, Timeline etc." required></textarea>
+            <textarea id="meetingNotes" name="meetingNotes" placeholder="Beschreibe das Kundengespräch, die Anforderungen, gewünschte Lösungen … oder lade eine Datei hoch."></textarea>
           </div>
 
           <div class="form-group">
@@ -101,7 +101,11 @@
                 <span class="label-text">Anzahl Slides</span>
                 <span class="label-badge label-optional">optional</span>
               </label>
-              <input type="number" id="numSlides" name="numSlides" value="10" min="5" max="20">
+              <div class="slide-mode-toggle" id="slideModeToggle">
+                <button type="button" class="slide-mode-btn active" data-mode="auto">Automatisch (KI)</button>
+                <button type="button" class="slide-mode-btn" data-mode="manual">Manuell</button>
+              </div>
+              <input type="number" id="numSlides" name="numSlides" value="10" min="5" max="20" class="hidden" placeholder="5–20 Slides">
             </div>
           </div>
 

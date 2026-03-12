@@ -364,6 +364,57 @@ select {
   padding-right: 36px;
 }
 
+/* ── Slide Mode Toggle ─────────────────────────────────────── */
+
+.slide-mode-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.slide-mode-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.slide-mode-btn + .slide-mode-btn {
+  border-left: 1px solid var(--border);
+}
+
+.slide-mode-btn:hover {
+  background: var(--magenta-dim);
+  color: var(--magenta);
+}
+
+.slide-mode-btn:focus-visible {
+  outline: 2px solid var(--magenta);
+  outline-offset: -2px;
+}
+
+.slide-mode-btn.active {
+  background: var(--magenta-dim);
+  color: var(--magenta);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--magenta);
+}
+
+/* ── Textarea Validation Error ─────────────────────────────── */
+
+textarea.input-error {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-dim);
+}
+
 /* ── Row layout ────────────────────────────────────────────── */
 
 .row {

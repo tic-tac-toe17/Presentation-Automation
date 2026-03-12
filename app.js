@@ -139,6 +139,7 @@ function addFiles(files) {
     }
   }
   renderFiles();
+  document.getElementById('meetingNotes').classList.remove('input-error');
 }
 
 function renderFiles() {
@@ -149,6 +150,7 @@ function renderFiles() {
       '<button type="button" class="remove" onclick="removeFile(' + i + ')">&times;</button>' +
     '</div>'
   ).join('');
+  updateMeetingNotesBadge();
 }
 
 function removeFile(idx) {
@@ -162,6 +164,40 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// ── Slide Mode Toggle ────────────────────────────────────────
+
+const slideModeToggle = document.getElementById('slideModeToggle');
+const numSlidesInput = document.getElementById('numSlides');
+let slideMode = 'auto';
+
+slideModeToggle.addEventListener('click', (e) => {
+  const btn = e.target.closest('.slide-mode-btn');
+  if (!btn) return;
+
+  slideMode = btn.dataset.mode;
+  slideModeToggle.querySelectorAll('.slide-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (slideMode === 'manual') {
+    numSlidesInput.classList.remove('hidden');
+  } else {
+    numSlidesInput.classList.add('hidden');
+  }
+});
+
+// ── Meeting Notes Badge ──────────────────────────────────────
+
+function updateMeetingNotesBadge() {
+  const badge = document.getElementById('meetingNotesBadge');
+  if (selectedFiles.length > 0) {
+    badge.textContent = 'optional';
+    badge.className = 'label-badge label-optional';
+  } else {
+    badge.textContent = 'Pflichtfeld';
+    badge.className = 'label-badge label-required';
+  }
+}
+
 // ── Form Submit ───────────────────────────────────────────────
 
 document.getElementById('presentationForm').addEventListener('submit', async (e) => {
@@ -171,9 +207,19 @@ document.getElementById('presentationForm').addEventListener('submit', async (e)
   const presentationType = document.getElementById('presentationType').value;
   const meetingNotes = document.getElementById('meetingNotes').value.trim();
   const email = document.getElementById('email').value.trim();
-  const numSlides = document.getElementById('numSlides').value || '10';
+  const numSlides = slideMode === 'auto' ? 'auto' : (document.getElementById('numSlides').value || '10');
 
-  if (!clientName || !meetingNotes || !email) return;
+  if (!clientName || !email) return;
+
+  // Require either meeting notes or at least one file
+  if (!meetingNotes && selectedFiles.length === 0) {
+    const notesEl = document.getElementById('meetingNotes');
+    notesEl.classList.add('input-error');
+    notesEl.placeholder = 'Bitte Meeting-Notizen eingeben oder eine Datei hochladen.';
+    notesEl.focus();
+    notesEl.addEventListener('input', () => notesEl.classList.remove('input-error'), { once: true });
+    return;
+  }
 
   // Disable button
   const btn = document.getElementById('submit-btn');
@@ -267,6 +313,19 @@ function resetForm() {
   document.getElementById('submit-btn').disabled = false;
   stopTimer();
   resetSteps();
+
+  // Reset slide mode toggle
+  slideMode = 'auto';
+  slideModeToggle.querySelectorAll('.slide-mode-btn').forEach(b => b.classList.remove('active'));
+  slideModeToggle.querySelector('[data-mode="auto"]').classList.add('active');
+  numSlidesInput.classList.add('hidden');
+
+  // Reset meeting notes state
+  const notesEl = document.getElementById('meetingNotes');
+  notesEl.classList.remove('input-error');
+  notesEl.placeholder = 'Beschreibe das Kundengespräch, die Anforderungen, gewünschte Lösungen … oder lade eine Datei hoch.';
+  updateMeetingNotesBadge();
+
   showSection(sectionForm);
 }
 
